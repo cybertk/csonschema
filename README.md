@@ -1,9 +1,44 @@
-# csonschema
+## csonschema
+
+Write jsonschema with cson
+
 
 [![Build Status](http://img.shields.io/travis/cybertk/csonschema.svg?style=flat)](https://travis-ci.org/cybertk/csonschema)
+[![Dependency Status](https://david-dm.org/cybertk/csonschema.png)](https://david-dm.org/cybertk/csonschema)
+[![Coverage Status](https://coveralls.io/repos/cybertk/csonschema/badge.png?branch=master)](https://coveralls.io/r/cybertk/csonschema?branch=master)
 
+## Features
 
 Only support Jsonchema draft 4.
+
+## Installation
+
+[Node.js][] and [NPM][] is required.
+
+    $ npm install csonschema
+
+[Node.js]: https://npmjs.org/
+[NPM]: https://npmjs.org/
+
+## Usage
+
+### CLI
+
+    $ csonschema schema.cson
+
+### Code
+
+```
+  // Include csonschema
+  schema = require('csonschema');
+
+  // Parse a file path
+  schema.parse('data.cson', function(err,obj){});  // async
+
+  // Parse a String
+  schema.parse(src, function(err,obj){});  // async
+
+```
 
 #### Types
 
@@ -43,3 +78,11 @@ required: [
   user: 'user'
 ]
 ```
+
+## Contribution
+
+## Run Tests
+
+    $ npm test
+
+Any contribution is more then welcome!
