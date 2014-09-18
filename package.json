@@ -2,24 +2,38 @@
   "name": "csonschema",
   "version": "0.0.0",
   "description": "Write jsonschema with cson",
-  "main": "index.js",
+  "main": "lib/index.js",
+  "directories": {
+    "test": "test"
+  },
   "scripts": {
-    "test": "echo pending"
+    "prepublish": "grunt coffee",
+    "test": "grunt test"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/cybertk/csonschema.git"
   },
   "keywords": [
-    "jsonschema",
     "cson",
-    "csonschema",
-    "$ref"
+    "jsonschema",
+    "reuse"
   ],
   "author": "Quanlong",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/cybertk/csonschema/issues"
   },
-  "homepage": "https://github.com/cybertk/csonschema"
+  "homepage": "https://github.com/cybertk/csonschema",
+  "devDependencies": {
+    "chai": "^1.9.1",
+    "coffee-script": "^1.8.0",
+    "grunt": "^0.4.5",
+    "grunt-cli": "^0.1.13",
+    "grunt-contrib-coffee": "^0.11.1",
+    "grunt-mocha-test": "^0.12.0",
+    "jit-grunt": "^0.8.0",
+    "mocha": "^1.21.4",
+    "time-grunt": "^1.0.0"
+  }
 }
