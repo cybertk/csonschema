@@ -1,0 +1,5 @@
+username: 'string'
+age: 'integer'
+verified: 'boolean'
+gender: ['F', 'M']
+created_at: 'date'

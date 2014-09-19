@@ -1,3 +1,6 @@
+fs = require 'fs'
+CSON = require 'cson-safe'
+
 
 # http://coffeescriptcookbook.com/chapters/arrays/check-type-is-array
 typeIsArray = Array.isArray || ( value ) -> return {}.toString.call( value ) is '[object Array]'
@@ -47,15 +50,29 @@ _traverse = (source, defs) ->
   obj
 
 
-parse = (source, callback) ->
+_parseFromObj = (obj, callback) ->
+  if obj.$defs
+    defs = _traverse obj.$defs
+    delete obj.$defs
 
-  if source.$defs
-    defs = _traverse source.$defs
-    delete source.$defs
-
-  jsonschema = _traverse source, defs
+  jsonschema = _traverse obj, defs
   jsonschema['$schema'] = 'http://json-schema.org/draft-04/schema'
 
   callback(null, jsonschema)
+
+parse = (source, callback) ->
+
+  switch typeof(source)
+    when 'string'
+      # CSON.parseFile does not support customized file extension, see https://github.com/bevry/cson/issues/49
+      fs.readFile source, (err, data) ->
+        return callback(err) if err
+
+        _parseFromObj (CSON.parse data), callback
+    when 'object'
+      _parseFromObj(source, callback)
+    else
+      callback(new Error('You must supply either file or obj as source.'))
+
 
 module.exports.parse = parse
