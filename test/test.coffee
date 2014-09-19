@@ -166,3 +166,16 @@ describe 'Parse', ->
       it 'should not required explicit un-required field', ->
         obj.required.should.have.length 1
         obj.required.should.include 'verified'
+
+
+  describe 'From file', ->
+
+    describe 'with simple schema', ->
+      before (done) ->
+        csonschema.parse "#{__dirname}/fixtures/sample1.schema", (err, _obj) ->
+          obj = _obj
+          done()
+
+      it 'should be a object', ->
+        obj.type.should.equal 'object'
+        obj.properties.should.be.a 'object'
