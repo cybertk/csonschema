@@ -10,6 +10,25 @@ _traverse = (source, defs) ->
   obj['type'] = 'object'
   properties = obj['properties'] = {}
 
+  # required
+  required = source.$required
+  delete source.$required
+
+  obj['required'] = (k for k, v of source)
+  if required
+
+    required = required.replace /^\s+/g, ""
+
+    if required.substring(0,1) != '-'
+      obj.required = []
+
+    for field in required.split ' '
+      if field.substring(0, 1) == '-'
+        obj.required.splice(obj.required.indexOf(field.substring(1)), 1)
+      else
+        obj.required.push(field)
+
+
   # see http://spacetelescope.github.io/understanding-json-schema/reference/type.html#type
   for k, v of source
     properties[k] =

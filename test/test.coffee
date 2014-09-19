@@ -109,3 +109,60 @@ describe 'Parse', ->
 
       subfield = field.properties.verified
       subfield.type.should.equal 'boolean'
+
+  describe 'Schema with $required', ->
+
+    describe 'implicit required', ->
+
+      before (done) ->
+        source =
+          username: 'string'
+          age: 'integer'
+          verified: 'boolean'
+
+        csonschema.parse source, (err, _obj) ->
+          obj = _obj
+          done()
+
+      it 'all fields should be required', ->
+        obj.required.should.have.length 3
+        obj.required.should.include 'username'
+        obj.required.should.include 'age'
+        obj.required.should.include 'verified'
+
+
+    describe 'and required fields explicitly', ->
+
+      before (done) ->
+        source =
+          username: 'string'
+          age: 'integer'
+          verified: 'boolean'
+          $required: 'age username'
+
+        csonschema.parse source, (err, _obj) ->
+          obj = _obj
+          done()
+
+      it 'should only required explicit field', ->
+        obj.required.should.have.length 2
+        obj.required.should.include 'age'
+        obj.required.should.include 'username'
+
+
+    describe 'and do not required fields explicitly', ->
+
+      before (done) ->
+        source =
+          username: 'string'
+          age: 'integer'
+          verified: 'boolean'
+          $required: '-age -username'
+
+        csonschema.parse source, (err, _obj) ->
+          obj = _obj
+          done()
+
+      it 'should not required explicit un-required field', ->
+        obj.required.should.have.length 1
+        obj.required.should.include 'verified'

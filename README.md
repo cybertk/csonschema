@@ -68,6 +68,7 @@ user:
   username: 'username'
   created_at: 'date'
   updated_at: 'date'
+  $required: '-username -created_at'
 ```
 
 #### Object Array
