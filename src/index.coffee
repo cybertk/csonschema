@@ -2,7 +2,8 @@
 # http://coffeescriptcookbook.com/chapters/arrays/check-type-is-array
 typeIsArray = Array.isArray || ( value ) -> return {}.toString.call( value ) is '[object Array]'
 
-_traverse = (source) ->
+
+_traverse = (source, defs) ->
 
   # Object
   obj = {}
@@ -18,17 +19,22 @@ _traverse = (source) ->
         else
           if typeIsArray v
             enum: v
+          else if 'string' == typeof v
+            defs.properties[v]
           else
-            _traverse v
+            _traverse v, defs
 
   obj['additionalProperties'] = false
   obj
 
 
 parse = (source, callback) ->
-  console.log('hi', callback)
 
-  jsonschema = _traverse source
+  if source.$defs
+    defs = _traverse source.$defs
+    delete source.$defs
+
+  jsonschema = _traverse source, defs
   jsonschema['$schema'] = 'http://json-schema.org/draft-04/schema'
 
   callback(null, jsonschema)

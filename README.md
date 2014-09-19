@@ -45,6 +45,7 @@ Only support Jsonchema draft 4.
 Defined all types in single one types file and reuse them in all schemas
 
 ```yaml
+
 username:
   type: 'string'
   pattern: '[1-9a-zA-Z]'
@@ -59,16 +60,14 @@ date:
 additionalProperties is false by default
 
 ```yaml
+
+$defs:
+  username: 'string'
+
 user:
   username: 'username'
   created_at: 'date'
   updated_at: 'date'
-
-additionalProperties: true
-required: [
-  'username'
-  'created_at'
-]
 ```
 
 #### Object Array

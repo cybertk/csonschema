@@ -57,25 +57,22 @@ describe 'Parse', ->
       obj.additionalProperties.should.not.ok
 
 
-  # describe 'Schema with customized types', ->
-  #
-  #   before (done) ->
-  #     source =
-  #       $defs:
-  #         username: 'string'
-  #         age: 'integer'
-  #         verified: 'boolean'
-  #         gender: ['F', 'M']
-  #         created_at: 'date'
-  #       created_at: 'created_at'
-  #
-  #     csonschema.parse source, (err, _obj) ->
-  #       obj = _obj
-  #       done()
-  #
-  #   it 'should use types defiend in $defs', ->
-  #     obj.properties.created_at.type.sholud.equal 'string'
-  #     obj.properties.created_at.format.sholud.equal 'date-time'
+  describe 'Schema with customized types', ->
+
+    before (done) ->
+      source =
+        $defs:
+          created_at: 'date'
+        created_at: 'created_at'
+
+      csonschema.parse source, (err, _obj) ->
+        console.log(_obj)
+        obj = _obj
+        done()
+
+    it 'should use types defiend in $defs', ->
+      obj.properties.created_at.type.should.equal 'string'
+      obj.properties.created_at.format.should.equal 'date-time'
 
 
   describe 'Schema with embedded objects', ->
