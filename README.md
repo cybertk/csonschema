@@ -73,9 +73,20 @@ user:
 
 #### Object Array
 
+Array as root object
+
 ```yaml
 [
   user: 'user'
+]
+```
+
+Array in field
+
+```yaml
+username: 'string'
+photos: [
+  url: 'string'
 ]
 ```
 

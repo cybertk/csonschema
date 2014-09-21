@@ -1,9 +1,6 @@
 fs = require 'fs'
 CSON = require 'cson-safe'
-
-
-# http://coffeescriptcookbook.com/chapters/arrays/check-type-is-array
-typeIsArray = Array.isArray || ( value ) -> return {}.toString.call( value ) is '[object Array]'
+_ = require 'underscore'
 
 
 _traverse = (source, defs) ->
@@ -39,9 +36,15 @@ _traverse = (source, defs) ->
         when 'string', 'integer', 'boolean' then type: v
         when 'date' then type: 'string', format: 'date-time'
         else
-          if typeIsArray v
-            enum: v
-          else if 'string' == typeof v
+          if _.isArray v
+            if v.length > 1
+              enum: v
+            else
+              {
+                type: 'array'
+                items: _traverse v[0], defs
+              }
+          else if _.isString v
             defs.properties[v]
           else
             _traverse v, defs
@@ -55,7 +58,12 @@ _parseFromObj = (obj, callback) ->
     defs = _traverse obj.$defs
     delete obj.$defs
 
-  jsonschema = _traverse obj, defs
+  if _.isArray obj
+    jsonschema =
+      type: 'array'
+      items: _traverse obj[0], defs
+  else
+    jsonschema = _traverse obj, defs
   jsonschema['$schema'] = 'http://json-schema.org/draft-04/schema'
 
   callback(null, jsonschema)
