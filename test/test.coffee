@@ -56,6 +56,52 @@ describe 'Parse', ->
     it 'object should not allow additional properties', ->
       obj.additionalProperties.should.not.ok
 
+  describe 'Schema with array', ->
+
+    describe 'as root schema', ->
+      before (done) ->
+        source =
+          [
+            w: 'integer'
+            h: 'integer'
+          ]
+
+        csonschema.parse source, (err, _obj) ->
+          obj = _obj
+          done()
+
+      it 'root object should be array', ->
+        obj.type.should.equal 'array'
+
+      it 'should have correct object in array items', ->
+        item = obj.items
+        item.type.should.equal 'object'
+        item.properties.w.type.should.equal 'integer'
+        item.properties.h.type.should.equal 'integer'
+
+    describe 'as array field', ->
+      describe 'contains object', ->
+
+        before (done) ->
+          source =
+            photos: [
+              w: 'integer'
+              h: 'integer'
+            ]
+
+          csonschema.parse source, (err, _obj) ->
+            obj = _obj
+            done()
+
+        it 'should have correct array field', ->
+          field = obj.properties.photos
+          field.type.should.equal 'array'
+
+        it 'should have correct object in array items', ->
+          item = obj.properties.photos.items
+          item.type.should.equal 'object'
+          item.properties.w.type.should.equal 'integer'
+          item.properties.h.type.should.equal 'integer'
 
   describe 'Schema with customized types', ->
 
@@ -66,7 +112,6 @@ describe 'Parse', ->
         created_at: 'created_at'
 
       csonschema.parse source, (err, _obj) ->
-        console.log(_obj)
         obj = _obj
         done()
 
