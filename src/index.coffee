@@ -63,7 +63,7 @@ _traverse = (source, defs) ->
   obj
 
 
-_parseFromObj = (obj, callback) ->
+_parseFromObj = (obj) ->
   if obj.$defs
     defs = _traverse obj.$defs
     delete obj.$defs
@@ -76,7 +76,7 @@ _parseFromObj = (obj, callback) ->
     jsonschema = _traverse obj, defs
   jsonschema['$schema'] = 'http://json-schema.org/draft-04/schema'
 
-  callback(null, jsonschema)
+  return jsonschema
 
 parse = (source, callback) ->
 
@@ -86,11 +86,22 @@ parse = (source, callback) ->
       fs.readFile source, (err, data) ->
         return callback(err) if err
 
-        _parseFromObj (CSON.parse data), callback
+        callback(null, _parseFromObj(CSON.parse data))
     when 'object'
-      _parseFromObj(source, callback)
+      callback(null, _parseFromObj(source))
     else
       callback(new Error('You must supply either file or obj as source.'))
 
+parseSync = (source) ->
+  switch typeof(source)
+    when 'string'
+      data = fs.readFileSync source
+      _parseFromObj(CSON.parse data)
+    when 'object'
+      _parseFromObj source
+    else
+      throw new Error('You must supply either file or obj as source.')
+
 
 module.exports.parse = parse
+module.exports.parseSync = parseSync
