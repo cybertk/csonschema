@@ -29,15 +29,17 @@ Only support Jsonchema draft 4.
 ### Code
 
 ```
-  // Include csonschema
-  schema = require('csonschema');
+// Include csonschema
+schema = require('csonschema');
 
-  // Parse a file path
-  schema.parse('data.cson', function(err,obj){});  // async
+// Parse a file path
+schema.parse('data.cson', function(err,obj){});  // async
 
-  // Parse a String
-  schema.parse(src, function(err,obj){});  // async
+// Parse a String
+schema.parse(src, function(err,obj){});  // async
 
+// Synchronize Parse
+obj = schema.parseSync(src);  // sync
 ```
 
 #### Types

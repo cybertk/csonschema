@@ -5,7 +5,7 @@ chai.should()
 
 obj = ''
 
-describe 'Parse', ->
+describe 'Parse Async', ->
 
   source = ''
 
@@ -242,3 +242,19 @@ describe 'Parse', ->
       it 'should be a object', ->
         obj.type.should.equal 'object'
         obj.properties.should.be.a 'object'
+
+
+describe 'Parse Sync', ->
+
+  source = ''
+
+  describe 'Simple schema', ->
+
+    before ->
+      source =
+        username: 'string'
+
+      obj = csonschema.parseSync source
+
+    it 'should be a jsonschema', ->
+      obj.$schema.should.equal 'http://json-schema.org/draft-04/schema'
