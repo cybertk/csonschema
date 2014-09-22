@@ -103,6 +103,24 @@ describe 'Parse', ->
           item.properties.w.type.should.equal 'integer'
           item.properties.h.type.should.equal 'integer'
 
+      describe 'contains simple types', ->
+
+        before (done) ->
+          source =
+            foos: [ 'string' ]
+
+          csonschema.parse source, (err, _obj) ->
+            obj = _obj
+            done()
+
+        it 'should have correct array field', ->
+          field = obj.properties.foos
+          field.type.should.equal 'array'
+
+        it 'should have correct object in array items', ->
+          item = obj.properties.foos.items
+          item.type.should.equal 'string'
+
   describe 'Schema with customized types', ->
 
     before (done) ->

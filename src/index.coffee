@@ -40,10 +40,20 @@ _traverse = (source, defs) ->
             if v.length > 1
               enum: v
             else
-              {
-                type: 'array'
-                items: _traverse v[0], defs
-              }
+
+              # Object in array, i.e [ { foo: 'bar' } ]
+              if _.isObject v[0]
+                {
+                  type: 'array'
+                  items: _traverse v[0], defs
+                }
+              # Simple type in array, i.e. [ 'string' ]
+              else
+                {
+                  type: 'array'
+                  items:
+                    type: v[0]
+                }
           else if _.isString v
             defs.properties[v]
           else
