@@ -33,7 +33,7 @@ _traverse = (source, defs) ->
   for k, v of source
     properties[k] =
       switch v
-        when 'string', 'integer', 'boolean' then type: v
+        when 'string', 'integer', 'number', 'boolean' then type: v
         when 'date' then type: 'string', format: 'date-time'
         else
           if _.isArray v
