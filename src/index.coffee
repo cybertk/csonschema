@@ -3,85 +3,93 @@ CSON = require 'cson-safe'
 _ = require 'underscore'
 
 
-_traverse = (source, defs) ->
+_parseField = (source, defs) ->
+  if _.isArray source
+    return _parseArray source, defs
 
+  else if _.isObject source
+      # $raw field
+      return source.$raw if source.$raw
+
+      # $include field
+      # TODO(quanlong): Async this call
+      return CSON.parse(fs.readFileSync source.$include) if source.$include
+
+      # Object field
+      return _parseObj source, defs
+
+  else if _.isString source
+    return _parseString source, defs
+  else
+    new Error("Syntax error, does not support '#{typeof source}'field")
+
+_parseArray = (array, defs) ->
+  # Enum field
+  return enum: array if array.length > 1
+
+  {
+    type: 'array'
+    items: _parseField array[0], defs
+  }
+
+_parseObj = (source, defs) ->
   # Object
   obj = {}
   obj['type'] = 'object'
   properties = obj['properties'] = {}
 
   # required
-  required = source.$required
-  delete source.$required
-
-  obj['required'] = (k for k, v of source)
-  if required
-
-    required = required.replace /^\s+/g, ""
-
-    if required.substring(0,1) != '-'
-      obj.required = []
-
-    for field in required.split ' '
-      if field.substring(0, 1) == '-'
-        obj.required.splice(obj.required.indexOf(field.substring(1)), 1)
-      else
-        obj.required.push(field)
-
+  obj['required'] = _parseRequired source
 
   # see http://spacetelescope.github.io/understanding-json-schema/reference/type.html#type
   for k, v of source
-    properties[k] =
-      switch v
-        when 'string', 'integer', 'number', 'boolean' then type: v
-        when 'date' then type: 'string', format: 'date-time'
-        else
-          if _.isArray v
-            if v.length > 1
-              enum: v
-            else
-
-              # Object in array, i.e [ { foo: 'bar' } ]
-              if _.isObject v[0]
-                {
-                  type: 'array'
-                  items: _traverse v[0], defs
-                }
-              # Simple type in array, i.e. [ 'string' ]
-              else
-                {
-                  type: 'array'
-                  items:
-                    type: v[0]
-                }
-          else if _.isString v
-            defs.properties[v]
-          # Raw field
-          else if v.$raw
-            v.$raw
-          # Include field
-          # TODO(quanlong): Async this call
-          else if v.$include
-            CSON.parse(fs.readFileSync v.$include)
-          else
-            _traverse v, defs
+    properties[k] = _parseField v, defs unless k is'$required'
 
   obj['additionalProperties'] = false
   obj
 
 
+_parseRequired = (source) ->
+
+  items = (k for k, v of source when k isnt '$required')
+
+  required = source.$required
+  if required
+    required = required.replace /^\s+/g, ""
+
+    items = [] if required.substring(0,1) isnt '-'
+
+    for field in required.split ' '
+      if field.substring(0, 1) == '-'
+        items.splice(items.indexOf(field.substring(1)), 1)
+      else
+        items.push(field)
+
+  items
+
+_parseString = (source, defs) ->
+  switch source
+    # Basic fields
+    when 'string', 'integer', 'number', 'boolean'
+      return type: source
+
+    # Advanced fields
+    when 'date'
+      return type: 'string', format: 'date-time'
+
+    else
+      return defs.properties[source] if defs['properties'][source]
+
+      new Error("Does not support field with value '#{source}'")
+
+
 _parseFromObj = (obj) ->
   obj = _.clone obj
   if obj.$defs
-    defs = _traverse obj.$defs
+    defs = _parseField obj.$defs
     delete obj.$defs
 
-  if _.isArray obj
-    jsonschema =
-      type: 'array'
-      items: _traverse obj[0], defs
-  else
-    jsonschema = _traverse obj, defs
+  jsonschema = _parseField obj, defs
   jsonschema['$schema'] = 'http://json-schema.org/draft-04/schema'
 
   return jsonschema

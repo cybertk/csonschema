@@ -75,6 +75,7 @@ describe 'Parse Async', ->
           ]
 
         csonschema.parse source, (err, _obj) ->
+          return done(err) if err
           obj = _obj
           done()
 
@@ -116,6 +117,26 @@ describe 'Parse Async', ->
         before (done) ->
           source =
             foos: [ 'string' ]
+
+          csonschema.parse source, (err, _obj) ->
+            obj = _obj
+            done()
+
+        it 'should have correct array field', ->
+          field = obj.properties.foos
+          field.type.should.equal 'array'
+
+        it 'should have correct object in array items', ->
+          item = obj.properties.foos.items
+          item.type.should.equal 'string'
+
+      describe 'contains $defs types', ->
+
+        before (done) ->
+          source =
+            $defs:
+              foo: 'string'
+            foos: [ 'foo' ]
 
           csonschema.parse source, (err, _obj) ->
             obj = _obj
