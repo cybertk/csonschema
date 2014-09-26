@@ -20,6 +20,7 @@ describe 'Parse Async', ->
         age: 'integer'
         verified: 'boolean'
         gender: ['F', 'M']
+        weight: 'number'
         created_at: 'date'
 
       csonschema.parse source, (err, _obj) ->
@@ -40,6 +41,10 @@ describe 'Parse Async', ->
     it 'object should have correct integer field', ->
       field = obj.properties.age
       field.type.should.equal 'integer'
+
+    it 'object should have correct number field', ->
+      field = obj.properties.weight
+      field.type.should.equal 'number'
 
     it 'object should have correct boolean field', ->
       field = obj.properties.verified
