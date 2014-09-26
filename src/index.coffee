@@ -56,6 +56,9 @@ _traverse = (source, defs) ->
                 }
           else if _.isString v
             defs.properties[v]
+          # Raw field
+          else if v.$raw
+            v.$raw
           else
             _traverse v, defs
 
@@ -64,6 +67,7 @@ _traverse = (source, defs) ->
 
 
 _parseFromObj = (obj) ->
+  obj = _.clone obj
   if obj.$defs
     defs = _traverse obj.$defs
     delete obj.$defs

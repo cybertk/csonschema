@@ -121,7 +121,7 @@ describe 'Parse Async', ->
           item = obj.properties.foos.items
           item.type.should.equal 'string'
 
-  describe 'Schema with customized types', ->
+  describe 'Schema with $defs', ->
 
     before (done) ->
       source =
@@ -230,6 +230,77 @@ describe 'Parse Async', ->
         obj.required.should.have.length 1
         obj.required.should.include 'verified'
 
+  describe 'Schema with $raw', ->
+
+    source = ''
+
+    describe 'as simple field', ->
+
+      before (done) ->
+        source =
+          username:
+            $raw:
+              type: 'string'
+              minLength: 1
+              maxLength: 10
+
+        csonschema.parse source, (err, _obj) ->
+          obj = _obj
+          done()
+
+      it 'should be a object', ->
+        obj.type.should.equal 'object'
+        obj.properties.should.be.a 'object'
+
+      it 'should expand $raw field', ->
+        obj.properties.username.should.equal source.username.$raw
+
+
+    describe 'contains in $defs field', ->
+
+      before (done) ->
+        source =
+          $defs:
+            username:
+              $raw:
+                type: 'string'
+                minLength: 1
+                maxLength: 10
+          u: 'username'
+
+        csonschema.parse source, (err, _obj) ->
+          obj = _obj
+          done()
+
+      it 'should be a object', ->
+        obj.type.should.equal 'object'
+        obj.properties.should.be.a 'object'
+
+      it 'should expand $raw field', ->
+        obj.properties.u.should.equal source.$defs.username.$raw
+
+
+  describe 'From file', ->
+
+    describe 'with simple schema', ->
+      before (done) ->
+        csonschema.parse "#{__dirname}/fixtures/sample1.schema", (err, _obj) ->
+          obj = _obj
+          done()
+
+      it 'should be a object', ->
+
+
+  describe 'From file', ->
+
+    describe 'with simple schema', ->
+      before (done) ->
+        csonschema.parse "#{__dirname}/fixtures/sample1.schema", (err, _obj) ->
+          obj = _obj
+          done()
+
+      it 'should be a object', ->
+        obj.type.should.equal 'object'
 
   describe 'From file', ->
 
