@@ -59,6 +59,10 @@ _traverse = (source, defs) ->
           # Raw field
           else if v.$raw
             v.$raw
+          # Include field
+          # TODO(quanlong): Async this call
+          else if v.$include
+            CSON.parse(fs.readFileSync v.$include)
           else
             _traverse v, defs
 

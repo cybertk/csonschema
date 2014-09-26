@@ -1,5 +1,8 @@
 csonschema = require '..'
 chai = require 'chai'
+fs = require 'fs'
+tmp = require 'tmp'
+CSON = require 'cson-safe'
 
 chai.should()
 
@@ -277,30 +280,40 @@ describe 'Parse Async', ->
         obj.properties.should.be.a 'object'
 
       it 'should expand $raw field', ->
-        obj.properties.u.should.equal source.$defs.username.$raw
+        obj.properties.u.should.deep.equal source.$defs.username.$raw
 
 
-  describe 'From file', ->
+  describe 'Schema with $include', ->
 
-    describe 'with simple schema', ->
+    include = ''
+
+    describe 'as simple field', ->
+
       before (done) ->
-        csonschema.parse "#{__dirname}/fixtures/sample1.schema", (err, _obj) ->
-          obj = _obj
-          done()
+        include = """
+                  username: 'string'
+                  age: 'integer'
+                  """
 
-      it 'should be a object', ->
+        tmp.file (err, path, fd) ->
+          return done(err) if err
 
+          fs.writeFileSync(path, include)
+          source =
+            user:
+              $include: path
 
-  describe 'From file', ->
-
-    describe 'with simple schema', ->
-      before (done) ->
-        csonschema.parse "#{__dirname}/fixtures/sample1.schema", (err, _obj) ->
-          obj = _obj
-          done()
+          csonschema.parse source, (err, _obj) ->
+            obj = _obj
+            done()
 
       it 'should be a object', ->
         obj.type.should.equal 'object'
+        obj.properties.should.be.a 'object'
+
+      it 'should expand $include field', ->
+        obj.properties.user.should.deep.equal(CSON.parse include)
+
 
   describe 'From file', ->
 
