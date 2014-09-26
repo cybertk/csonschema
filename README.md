@@ -11,6 +11,40 @@ Write jsonschema with cson
 
 Only support Jsonchema draft 4.
 
+### Simple csonschema
+
+```coffee
+username: 'string'
+age: 'integer'
+verified: 'boolean'
+gender: ['F', 'M']
+created_at: 'date'
+```
+
+### Advanced csonschema
+
+```
+$defs
+  user:
+    $include: "user.schema"
+  tag:
+    $raw:
+      type: 'string'
+      pattern: '^(\\([0-9]{3}\\))?[0-9]{3}-[0-9]{4}$'
+  count:
+    $raw:
+      type: 'integer'
+      minimum: 1
+      maximum: 100
+
+# Define a media object
+owner: 'user'
+tags: ['tag']
+tag_count: 'count'
+desc: 'string'
+created_at: 'date'
+```
+
 ## Installation
 
 [Node.js][] and [NPM][] is required.
@@ -26,7 +60,7 @@ Only support Jsonchema draft 4.
 
     $ csonschema schema.cson
 
-### Code
+### As lib in code
 
 ```
 // Include csonschema
@@ -42,19 +76,21 @@ schema.parse(src, function(err,obj){});  // async
 obj = schema.parseSync(src);  // sync
 ```
 
-#### Types
+#### Raw Field
 
-Defined all types in single one types file and reuse them in all schemas
+Raw Field will be translated to json format directly without any modification, it is represented with `$raw` keyword.
 
 ```yaml
 
 username:
-  type: 'string'
-  pattern: '[1-9a-zA-Z]'
+  $raw:
+    type: 'string'
+    pattern: '[1-9a-zA-Z]'
 
 date:
-  type: 'string'
-  format: 'date-time'
+  $raw:
+    type: 'string'
+    format: 'date-time'
 ```
 
 #### Object
@@ -73,7 +109,7 @@ user:
   $required: '-username -created_at'
 ```
 
-#### Object Array
+#### Array Field
 
 Array as root object
 
