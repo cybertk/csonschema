@@ -1,0 +1,5 @@
+$defs:
+  $_:
+    $include: 'sample1.schema'
+
+username: 'username'
