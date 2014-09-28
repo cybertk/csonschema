@@ -70,21 +70,32 @@ _parseObj = (source, defs) ->
 
 _parseRequired = (source) ->
 
-  items = (k for k, v of source when k isnt '$required')
+  requires = []
+  unrequires = []
 
-  required = source.$required
-  if required
-    required = required.replace /^\s+/g, ""
-
-    items = [] if required.substring(0,1) isnt '-'
-
-    for field in required.split ' '
-      if field.substring(0, 1) == '-'
-        items.splice(items.indexOf(field.substring(1)), 1)
+  # Fill requires and unrequires array
+  if source.$required
+    throw new Error('$required should be string') unless _.isString(source.$required)
+    
+    for field in source.$required.split ' '
+      if field.substring(0, 1) is '-'
+        unrequires.push field.substring(1)
       else
-        items.push(field)
+        requires.push field
 
-  items
+  if requires.length > 0 and unrequires.length > 0
+    throw new Error('Should not mix required and unrequired')
+
+  items = (k for k, v of source when k isnt '$required')
+  for item in _.union(requires, unrequires)
+    throw new Error("Required non-exist field: #{item}") if _.indexOf(items, item) is -1
+
+  # Requires
+  return requires if requires.length
+
+  # Unrequires
+  _.difference(items, unrequires)
+
 
 _parseString = (source, defs) ->
   switch source
@@ -118,18 +129,22 @@ _parseFromObj = (obj) ->
 
 parse = (source, callback) ->
 
-  switch typeof(source)
-    when 'string'
-      DIR = path.dirname _normalize_path(source, DIR)
-      # CSON.parseFile does not support customized file extension, see https://github.com/bevry/cson/issues/49
-      fs.readFile source, (err, data) ->
-        return callback(err) if err
+  try
+    switch typeof(source)
+      when 'string'
+        DIR = path.dirname _normalize_path(source, DIR)
+        # CSON.parseFile does not support customized file extension, see https://github.com/bevry/cson/issues/49
+        fs.readFile source, (err, data) ->
+          return callback(err) if err
+          callback(null, _parseFromObj(CSON.parse data))
 
-        callback(null, _parseFromObj(CSON.parse data))
-    when 'object'
-      callback(null, _parseFromObj(source))
-    else
-      callback(new Error('You must supply either file or obj as source.'))
+      when 'object'
+        callback(null, _parseFromObj(source))
+      else
+        callback(new Error('You must supply either file or obj as source.'))
+
+  catch error
+    callback(error)
 
 parseSync = (source) ->
   switch typeof(source)

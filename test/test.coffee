@@ -4,8 +4,16 @@ fs = require 'fs'
 tmp = require 'tmp'
 
 chai.should()
+expect = chai.expect
 
 obj = ''
+err = ''
+
+resultHandler = (callback) ->
+  return (_err, _obj) ->
+    err = _err
+    obj = _obj
+    callback()
 
 describe 'Parse Async', ->
 
@@ -383,6 +391,45 @@ describe 'Parse Async', ->
         field.properties.username.type.should.equal 'string'
         field.properties.age.type.should.equal 'integer'
 
+  describe 'With invalid schema', ->
+
+    err = ''
+    describe 'contains $required', ->
+
+      describe 'does not exist', ->
+
+        before (done) ->
+          source =
+            foo: 'string'
+            $required: 'ss'
+
+          csonschema.parse source, (_err, _obj) ->
+            err = _err
+            obj = _obj
+            done()
+
+        it 'should not return parsed object', ->
+          expect(obj).to.be.undefined
+
+        it 'should failed with error message', ->
+          err.name.should.equal 'Error'
+          err.message.should.equal 'Required non-exist field: ss'
+
+      describe 'with invalid format', ->
+
+        before (done) ->
+          source =
+            foo: 'string'
+            $required: ['ss']
+
+          csonschema.parse source, resultHandler(done)
+
+        it 'should not return parsed object', ->
+          expect(obj).to.be.undefined
+
+        it 'should failed with error message', ->
+          err.name.should.equal 'Error'
+          err.message.should.equal '$required should be string'
 
   describe 'From file', ->
 
