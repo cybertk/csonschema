@@ -2,7 +2,6 @@ csonschema = require '..'
 chai = require 'chai'
 fs = require 'fs'
 tmp = require 'tmp'
-CSON = require 'cson-safe'
 
 chai.should()
 
@@ -379,7 +378,10 @@ describe 'Parse Async', ->
         obj.properties.should.be.a 'object'
 
       it 'should expand $include field', ->
-        obj.properties.user.should.deep.equal(CSON.parse include)
+        field =  obj.properties.user
+        field.type.should.equal 'object'
+        field.properties.username.type.should.equal 'string'
+        field.properties.age.type.should.equal 'integer'
 
 
   describe 'From file', ->
