@@ -3,8 +3,7 @@ CSON = require 'cson-safe'
 _ = require 'underscore'
 path = require 'path'
 
-
-DIR = process.env.PWD
+DIR = ''
 
 _normalize_path = (filename, basedir) ->
   if filename.charAt(0) is '/'
@@ -132,7 +131,7 @@ parse = (source, callback) ->
   try
     switch typeof(source)
       when 'string'
-        DIR = path.dirname _normalize_path(source, DIR)
+        DIR = path.dirname _normalize_path(source, process.env.PWD)
         # CSON.parseFile does not support customized file extension, see https://github.com/bevry/cson/issues/49
         fs.readFile source, (err, data) ->
           return callback(err) if err
@@ -149,7 +148,7 @@ parse = (source, callback) ->
 parseSync = (source) ->
   switch typeof(source)
     when 'string'
-      DIR = path.dirname _normalize_path(source, DIR)
+      DIR = path.dirname _normalize_path(source, process.env.PWD)
       data = fs.readFileSync source
       _parseFromObj(CSON.parse data)
     when 'object'

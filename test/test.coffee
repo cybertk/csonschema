@@ -467,6 +467,19 @@ describe 'Parse Async', ->
         obj.type.should.equal 'object'
         obj.properties.should.be.a 'object'
 
+    describe 'with schema contains $include twice', ->
+      before (done) ->
+        csonschema.parse "#{__dirname}/fixtures/sample2.schema", (err, _obj) ->
+          obj = _obj
+
+          csonschema.parse "#{__dirname}/fixtures/sample2.schema", (err, _obj) ->
+            obj = _obj
+            done()
+
+      it 'should be a object', ->
+        obj.type.should.equal 'object'
+        obj.properties.should.be.a 'object'
+
 describe 'Parse Sync', ->
 
   source = ''
@@ -478,6 +491,18 @@ describe 'Parse Sync', ->
         username: 'string'
 
       obj = csonschema.parseSync source
+
+    it 'should be a jsonschema', ->
+      obj.$schema.should.equal 'http://json-schema.org/draft-04/schema'
+
+  describe 'Schema multiple times', ->
+
+    before ->
+      source =
+        username: 'string'
+
+      obj = csonschema.parseSync "test/fixtures/sample2.schema"
+      obj = csonschema.parseSync "test/fixtures/sample2.schema"
 
     it 'should be a jsonschema', ->
       obj.$schema.should.equal 'http://json-schema.org/draft-04/schema'
