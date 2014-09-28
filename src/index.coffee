@@ -102,9 +102,12 @@ _parseString = (source, defs) ->
     when 'string', 'integer', 'number', 'boolean'
       return type: source
 
-    # Advanced fields
+    # See http://spacetelescope.github.io/understanding-json-schema/reference/string.html
+    # Jsonschema draft 4 built-in format
     when 'date'
       return type: 'string', format: 'date-time'
+    when 'email', 'uri'
+      return type: 'string', format: source
 
     else
 

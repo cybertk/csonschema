@@ -28,6 +28,8 @@ describe 'Parse Async', ->
         verified: 'boolean'
         gender: ['F', 'M']
         weight: 'number'
+        email: 'email'
+        avatar_url: 'uri'
         created_at: 'date'
 
       csonschema.parse source, (err, _obj) ->
@@ -67,6 +69,16 @@ describe 'Parse Async', ->
       field = obj.properties.created_at
       field.type.should.equal 'string'
       field.format.should.equal 'date-time'
+
+    it 'object should have correct email field', ->
+      field = obj.properties.email
+      field.type.should.equal 'string'
+      field.format.should.equal 'email'
+
+    it 'object should have correct uri field', ->
+      field = obj.properties.avatar_url
+      field.type.should.equal 'string'
+      field.format.should.equal 'uri'
 
     it 'object should not allow additional properties', ->
       obj.additionalProperties.should.not.ok
