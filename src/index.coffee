@@ -32,7 +32,7 @@ _parseField = (source, defs) ->
 
       # $include field
       # TODO(quanlong): Async this call
-      return CSON.parse(fs.readFileSync _normalize_path(source.$include, DIR)) if source.$include
+      return _parseField CSON.parse(fs.readFileSync _normalize_path(source.$include, DIR)), defs if source.$include
 
       # Object field
       return _parseObj source, defs
@@ -101,7 +101,7 @@ _parseString = (source, defs) ->
       # Global $def
       return defs.properties.$_.properties[source] if defs.properties?.$_?.properties?[source]?
 
-      # Cutomized $fed
+      # Cutomized $def
       _parseCustomizedType(source, defs)
 
 
