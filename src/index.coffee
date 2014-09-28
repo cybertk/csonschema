@@ -148,16 +148,22 @@ parse = (source, callback) ->
   catch error
     callback(error)
 
-parseSync = (source) ->
-  switch typeof(source)
-    when 'string'
-      DIR = path.dirname _normalize_path(source, process.env.PWD)
-      data = fs.readFileSync source
-      _parseFromObj(CSON.parse data)
-    when 'object'
-      _parseFromObj source
-    else
-      throw new Error('You must supply either file or obj as source.')
+parseSync = (source, defs) ->
+  throw new Error('You must supply either file or obj as source.') unless typeof(source) is 'string' or 'object'
+
+  # Global defs
+  defs = CSON.parse fs.readFileSync(defs) if _.isString(defs)
+
+  if typeof(source) is 'string'
+    DIR = path.dirname _normalize_path(source, process.env.PWD)
+    source = CSON.parse fs.readFileSync(source)
+
+  # Extend $_ from global defs
+  source.$defs ?= {}
+  source.$defs.$_ ?= {}
+  _.extend(source.$defs.$_, defs) if _.isObject(defs)
+
+  _parseFromObj source
 
 
 module.exports.parse = parse

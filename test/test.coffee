@@ -518,3 +518,45 @@ describe 'Parse Sync', ->
 
     it 'should be a jsonschema', ->
       obj.$schema.should.equal 'http://json-schema.org/draft-04/schema'
+
+  describe 'Simple schema with global $defs', ->
+
+    describe 'as object', ->
+
+      before (done)->
+        source =
+          username: 'foo'
+        defs = "foo: 'string'"
+
+        tmp.file (err, path, fd) ->
+          return done(err) if err
+
+          fs.writeFileSync(path, defs)
+
+          obj = csonschema.parseSync source, path
+          done()
+
+      it 'should be a jsonschema', ->
+        obj.$schema.should.equal 'http://json-schema.org/draft-04/schema'
+
+      it 'should expand type passed global', ->
+        obj.properties.username.type.should.equal 'string'
+
+    describe 'as file', ->
+
+      before (done)->
+        defs = "foo: 'string'"
+
+        tmp.file (err, path, fd) ->
+          return done(err) if err
+
+          fs.writeFileSync(path, defs)
+
+          obj = csonschema.parseSync "#{__dirname}/fixtures/sample3.schema", path
+          done()
+
+      it 'should be a jsonschema', ->
+        obj.$schema.should.equal 'http://json-schema.org/draft-04/schema'
+
+      it 'should expand type passed global', ->
+        obj.properties.username.type.should.equal 'string'
