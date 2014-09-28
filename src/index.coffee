@@ -3,6 +3,16 @@ CSON = require 'cson-safe'
 _ = require 'underscore'
 
 
+_parseCustomizedType = (type, defs) ->
+  [t0, t1...] = type.split '.'
+
+  throw new Error("Does not support field with value '#{type}'") unless defs.properties?[t0]?
+
+  if t1.length > 0
+    _parseCustomizedType(t1.join('.'), defs.properties[t0])
+  else
+    defs.properties[t0]
+
 _parseField = (source, defs) ->
   if _.isArray source
     return _parseArray source, defs
@@ -21,7 +31,7 @@ _parseField = (source, defs) ->
   else if _.isString source
     return _parseString source, defs
   else
-    new Error("Syntax error, does not support '#{typeof source}'field")
+    throw Error("Syntax error, does not support '#{typeof source}'field")
 
 _parseArray = (array, defs) ->
   # Enum field
@@ -78,9 +88,7 @@ _parseString = (source, defs) ->
       return type: 'string', format: 'date-time'
 
     else
-      return defs.properties[source] if defs['properties'][source]
-
-      new Error("Does not support field with value '#{source}'")
+      _parseCustomizedType(source, defs)
 
 
 _parseFromObj = (obj) ->
