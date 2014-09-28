@@ -152,20 +152,39 @@ describe 'Parse Async', ->
 
   describe 'Schema with $defs', ->
 
-    before (done) ->
-      source =
-        $defs:
-          created_at: 'date'
-        created_at: 'created_at'
+    describe 'contains simple type', ->
 
-      csonschema.parse source, (err, _obj) ->
-        obj = _obj
-        done()
+      before (done) ->
+        source =
+          $defs:
+            created_at: 'date'
+          created_at: 'created_at'
 
-    it 'should use types defiend in $defs', ->
-      obj.properties.created_at.type.should.equal 'string'
-      obj.properties.created_at.format.should.equal 'date-time'
+        csonschema.parse source, (err, _obj) ->
+          obj = _obj
+          done()
 
+      it 'should use types defiend in $defs', ->
+        obj.properties.created_at.type.should.equal 'string'
+        obj.properties.created_at.format.should.equal 'date-time'
+
+    describe 'contains cascading type', ->
+
+      before (done) ->
+        source =
+          $defs:
+            foo:
+              bar:
+                koo: 'date'
+          created_at: 'foo.bar.koo'
+
+        csonschema.parse source, (err, _obj) ->
+          obj = _obj
+          done()
+
+      it 'should use types defiend in $defs', ->
+        obj.properties.created_at.type.should.equal 'string'
+        obj.properties.created_at.format.should.equal 'date-time'
 
   describe 'Schema with embedded objects', ->
 

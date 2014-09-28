@@ -39,6 +39,7 @@ $defs
 
 # Define a media object
 owner: 'user'
+avatar_url: 'user.avatar_url'
 tags: ['tag']
 tag_count: 'count'
 desc: 'string'
