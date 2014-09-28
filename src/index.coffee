@@ -1,7 +1,16 @@
 fs = require 'fs'
 CSON = require 'cson-safe'
 _ = require 'underscore'
+path = require 'path'
 
+
+DIR = process.env.PWD
+
+_normalize_path = (filename, basedir) ->
+  if filename.charAt(0) is '/'
+    filename
+  else
+    path.join(basedir, filename)
 
 _parseCustomizedType = (type, defs) ->
   [t0, t1...] = type.split '.'
@@ -23,7 +32,7 @@ _parseField = (source, defs) ->
 
       # $include field
       # TODO(quanlong): Async this call
-      return CSON.parse(fs.readFileSync source.$include) if source.$include
+      return CSON.parse(fs.readFileSync _normalize_path(source.$include, DIR)) if source.$include
 
       # Object field
       return _parseObj source, defs
@@ -111,6 +120,7 @@ parse = (source, callback) ->
 
   switch typeof(source)
     when 'string'
+      DIR = path.dirname _normalize_path(source, DIR)
       # CSON.parseFile does not support customized file extension, see https://github.com/bevry/cson/issues/49
       fs.readFile source, (err, data) ->
         return callback(err) if err
@@ -124,6 +134,7 @@ parse = (source, callback) ->
 parseSync = (source) ->
   switch typeof(source)
     when 'string'
+      DIR = path.dirname _normalize_path(source, DIR)
       data = fs.readFileSync source
       _parseFromObj(CSON.parse data)
     when 'object'

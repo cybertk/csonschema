@@ -394,6 +394,15 @@ describe 'Parse Async', ->
         obj.type.should.equal 'object'
         obj.properties.should.be.a 'object'
 
+    describe 'with schema contains $include', ->
+      before (done) ->
+        csonschema.parse "#{__dirname}/fixtures/sample2.schema", (err, _obj) ->
+          obj = _obj
+          done()
+
+      it 'should be a object', ->
+        obj.type.should.equal 'object'
+        obj.properties.should.be.a 'object'
 
 describe 'Parse Sync', ->
 
