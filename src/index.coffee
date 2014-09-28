@@ -15,7 +15,7 @@ _normalize_path = (filename, basedir) ->
 _parseCustomizedType = (type, defs) ->
   [t0, t1...] = type.split '.'
 
-  throw new Error("Does not support field with value '#{type}'") unless defs.properties?[t0]?
+  throw new Error("Type is not defined: #{type}") unless defs?.properties?[t0]?
 
   if t1.length > 0
     _parseCustomizedType(t1.join('.'), defs.properties[t0])
@@ -76,7 +76,7 @@ _parseRequired = (source) ->
   # Fill requires and unrequires array
   if source.$required
     throw new Error('$required should be string') unless _.isString(source.$required)
-    
+
     for field in source.$required.split ' '
       if field.substring(0, 1) is '-'
         unrequires.push field.substring(1)
@@ -110,7 +110,7 @@ _parseString = (source, defs) ->
     else
 
       # Global $def
-      return defs.properties.$_.properties[source] if defs.properties?.$_?.properties?[source]?
+      return defs.properties.$_.properties[source] if defs?.properties?.$_?.properties?[source]?
 
       # Cutomized $def
       _parseCustomizedType(source, defs)
