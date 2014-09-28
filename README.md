@@ -25,6 +25,12 @@ created_at: 'date'
 
 ```
 $defs
+  $_:
+    geo-point: ['number']
+    photo:
+      w: 'integer'
+      h: 'integer'
+      url: 'string'
   user:
     $include: "user.schema"
   tag:
@@ -43,7 +49,11 @@ avatar_url: 'user.avatar_url'
 tags: ['tag']
 tag_count: 'count'
 desc: 'string'
+photo: 'photo'
+location: 'geo-point'
 created_at: 'date'
+
+$required: '-location -tags'
 ```
 
 ## Installation
@@ -127,6 +137,22 @@ username: 'string'
 photos: [
   url: 'string'
 ]
+```
+
+#### Customized types
+
+Customized types are defined under `$defs`.
+- Support reference with cascading format like `foo.bar`
+- Global types without typing prefix `$_`. e.g. `$_.foo` is equal to `foo`
+
+```yaml
+$defs:
+  $_:
+    location:
+      desc: 'string'
+      coordinates: ['number']
+
+  username: 'string'
 ```
 
 ## Contribution

@@ -186,6 +186,28 @@ describe 'Parse Async', ->
         obj.properties.created_at.type.should.equal 'string'
         obj.properties.created_at.format.should.equal 'date-time'
 
+    describe 'contains global type', ->
+
+      before (done) ->
+        source =
+          $defs:
+            $_:
+              bar: 'date'
+          updated_at: '$_.bar'
+          created_at: 'bar'
+
+        csonschema.parse source, (err, _obj) ->
+          obj = _obj
+          done()
+
+      it 'should use types defiend in $defs', ->
+        obj.properties.updated_at.type.should.equal 'string'
+        obj.properties.updated_at.format.should.equal 'date-time'
+
+      it 'should use cascading type defiend in $defs', ->
+        obj.properties.created_at.type.should.equal 'string'
+        obj.properties.created_at.format.should.equal 'date-time'
+
   describe 'Schema with embedded objects', ->
 
     before (done) ->
