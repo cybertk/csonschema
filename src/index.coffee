@@ -88,6 +88,11 @@ _parseString = (source, defs) ->
       return type: 'string', format: 'date-time'
 
     else
+
+      # Global $def
+      return defs.properties.$_.properties[source] if defs.properties?.$_?.properties?[source]?
+
+      # Cutomized $fed
       _parseCustomizedType(source, defs)
 
 
