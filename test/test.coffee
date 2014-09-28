@@ -393,7 +393,6 @@ describe 'Parse Async', ->
 
   describe 'With invalid schema', ->
 
-    err = ''
     describe 'contains $required', ->
 
       describe 'does not exist', ->
@@ -430,6 +429,21 @@ describe 'Parse Async', ->
         it 'should failed with error message', ->
           err.name.should.equal 'Error'
           err.message.should.equal '$required should be string'
+
+    describe 'contains nonexist type', ->
+
+      before (done) ->
+        source =
+          foo: 'bar'
+
+        csonschema.parse source, resultHandler(done)
+
+      it 'should not return parsed object', ->
+        expect(obj).to.be.undefined
+
+      it 'should failed with error message', ->
+        err.name.should.equal 'Error'
+        err.message.should.equal 'Type is not defined: bar'
 
   describe 'From file', ->
 
