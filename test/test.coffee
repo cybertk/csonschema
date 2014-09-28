@@ -83,31 +83,91 @@ describe 'Parse Async', ->
     it 'object should not allow additional properties', ->
       obj.additionalProperties.should.not.ok
 
+  describe 'Schema with recursive $defs', ->
+
+    before (done) ->
+      source =
+        $defs:
+          foo:
+            $defs:
+              bar: 'string'
+            bar: 'integer'
+          koo: 'boolean'
+
+        a: 'koo'
+        b: 'foo'
+        c: 'bar'
+        d: 'foo.bar'
+
+      csonschema.parse source, resultHandler(done)
+
+    it 'should be a object', ->
+      obj.type.should.equal 'object'
+      obj.properties.should.be.a 'object'
+
+    it 'should have correct a field', ->
+      obj.properties.a.type.should.equal 'boolean'
+
+    it 'should have correct b field', ->
+      obj.properties.b.type.should.equal 'object'
+      obj.properties.b.properties.bar.type.should.equal 'integer'
+      expect(obj.properties.b.properties.$def).to.be.undefined
+
+    it 'should have correct c field', ->
+      obj.properties.c.type.should.equal 'string'
+
+    it 'should have correct d field', ->
+      obj.properties.d.type.should.equal 'integer'
+
   describe 'Schema with array', ->
 
     describe 'as root schema', ->
-      before (done) ->
-        source =
-          [
-            w: 'integer'
-            h: 'integer'
-          ]
 
-        csonschema.parse source, (err, _obj) ->
-          return done(err) if err
-          obj = _obj
-          done()
+      describe 'and item is simple object', ->
 
-      it 'root object should be array', ->
-        obj.type.should.equal 'array'
+        before (done) ->
+          source =
+            [
+              w: 'integer'
+              h: 'integer'
+            ]
 
-      it 'should have correct object in array items', ->
-        item = obj.items
-        item.type.should.equal 'object'
-        item.properties.w.type.should.equal 'integer'
-        item.properties.h.type.should.equal 'integer'
+          csonschema.parse source, (err, _obj) ->
+            return done(err) if err
+            obj = _obj
+            done()
+
+        it 'root object should be array', ->
+          obj.type.should.equal 'array'
+
+        it 'should have correct object in array items', ->
+          item = obj.items
+          item.type.should.equal 'object'
+          item.properties.w.type.should.equal 'integer'
+          item.properties.h.type.should.equal 'integer'
+
+      describe 'and item contains customized type', ->
+
+        before (done) ->
+          source =
+            [
+              $defs:
+                bar: 'string'
+              foo: 'bar'
+            ]
+
+          csonschema.parse source, resultHandler(done)
+
+        it 'root object should be array', ->
+          obj.type.should.equal 'array'
+
+        it 'should have correct object in array items', ->
+          item = obj.items
+          item.type.should.equal 'object'
+          item.properties.foo.type.should.equal 'string'
 
     describe 'as array field', ->
+
       describe 'contains object', ->
 
         before (done) ->
@@ -157,9 +217,7 @@ describe 'Parse Async', ->
               foo: 'string'
             foos: [ 'foo' ]
 
-          csonschema.parse source, (err, _obj) ->
-            obj = _obj
-            done()
+          csonschema.parse source, resultHandler(done)
 
         it 'should have correct array field', ->
           field = obj.properties.foos
@@ -187,7 +245,7 @@ describe 'Parse Async', ->
         obj.properties.created_at.type.should.equal 'string'
         obj.properties.created_at.format.should.equal 'date-time'
 
-    describe 'contains cascading type', ->
+    describe 'contains recursive type', ->
 
       before (done) ->
         source =
@@ -223,7 +281,7 @@ describe 'Parse Async', ->
         obj.properties.updated_at.type.should.equal 'string'
         obj.properties.updated_at.format.should.equal 'date-time'
 
-      it 'should use cascading type defiend in $defs', ->
+      it 'should use recursive type defiend in $defs', ->
         obj.properties.created_at.type.should.equal 'string'
         obj.properties.created_at.format.should.equal 'date-time'
 
@@ -541,6 +599,28 @@ describe 'Parse Sync', ->
 
       it 'should expand type passed global', ->
         obj.properties.username.type.should.equal 'string'
+
+    describe 'as array', ->
+
+      before (done)->
+        source = [
+          username: 'foo'
+        ]
+        defs = "foo: 'string'"
+
+        tmp.file (err, path, fd) ->
+          return done(err) if err
+
+          fs.writeFileSync(path, defs)
+
+          obj = csonschema.parseSync source, path
+          done()
+
+      it 'should be a jsonschema', ->
+        obj.$schema.should.equal 'http://json-schema.org/draft-04/schema'
+
+      it 'should expand type passed global', ->
+        obj.items.properties.username.type.should.equal 'string'
 
     describe 'as file', ->
 

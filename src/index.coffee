@@ -118,11 +118,24 @@ _parseString = (source, defs) ->
       _parseCustomizedType(source, defs)
 
 
-_parseFromObj = (obj) ->
+_parseDefs = (obj, defs) ->
+  return unless _.isObject(obj)
+
+  defs ?= {}
+
+  # For array
+  obj = obj[0] if _.isArray(obj)
+
+  # Fill defs
+  _.extend(defs, _parseDefs v) for k, v of obj
+  _.extend(defs, obj.$defs) if obj.$defs
+
+  delete obj.$defs
+  defs
+
+_parseFromObj = (obj, defs) ->
   obj = _.clone obj
-  if obj.$defs
-    defs = _parseField obj.$defs
-    delete obj.$defs
+  defs = _parseField _parseDefs(obj, defs)
 
   jsonschema = _parseField obj, defs
   jsonschema['$schema'] = 'http://json-schema.org/draft-04/schema'
@@ -152,18 +165,18 @@ parseSync = (source, defs) ->
   throw new Error('You must supply either file or obj as source.') unless typeof(source) is 'string' or 'object'
 
   # Global defs
-  defs = CSON.parse fs.readFileSync(defs) if _.isString(defs)
+  defs = {$_: CSON.parse fs.readFileSync(defs)} if _.isString(defs)
 
   if typeof(source) is 'string'
     DIR = path.dirname _normalize_path(source, process.env.PWD)
     source = CSON.parse fs.readFileSync(source)
 
   # Extend $_ from global defs
-  source.$defs ?= {}
-  source.$defs.$_ ?= {}
-  _.extend(source.$defs.$_, defs) if _.isObject(defs)
+  # source.$defs ?= {}
+  # source.$defs.$_ ?= {}
+  # _.extend(source.$defs.$_, defs) if _.isObject(defs)
 
-  _parseFromObj source
+  _parseFromObj source, defs
 
 
 module.exports.parse = parse
