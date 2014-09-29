@@ -11,6 +11,7 @@ err = ''
 
 resultHandler = (callback) ->
   return (_err, _obj) ->
+
     err = _err
     obj = _obj
     callback()
@@ -494,6 +495,21 @@ describe 'Parse Async', ->
           csonschema.parse source, resultHandler(done)
 
       it 'should be a array', ->
+        obj.type.should.equal 'array'
+        obj.items.type.should.equal 'object'
+        obj.items.properties.username.type.should.equal 'string'
+
+    describe 'contains another $include', ->
+
+      before (done) ->
+        source = [
+          $include: "#{__dirname}/fixtures/sample2.schema"
+        ]
+
+        csonschema.parse source, resultHandler(done)
+
+      it 'should be a array', ->
+        # console.log(err, obj)
         obj.type.should.equal 'array'
         obj.items.type.should.equal 'object'
         obj.items.properties.username.type.should.equal 'string'

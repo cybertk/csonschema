@@ -132,19 +132,35 @@ _parseDefs = (obj, defs) ->
   delete obj.$defs
   defs
 
-_parseInclude = (obj) ->
+_parseInclude = (obj, dir) ->
   return unless _.isObject(obj)
 
-  for k, v of obj
-    if v.$include
-      obj[k] = CSON.parse(fs.readFileSync _normalize_path(v.$include, DIR))
+  if _.isArray(obj)
 
-    _parseInclude v
+    if obj[0].$include
+      filename = _normalize_path(obj[0].$include, dir)
+      obj[0] = CSON.parse(fs.readFileSync filename)
 
-_parseFromObj = (obj, defs) ->
+    dir = path.dirname filename if filename
+    _parseInclude obj[0], dir
+
+  else
+
+    for k of obj
+      if obj[k].$include
+        filename = _normalize_path(obj[k].$include, dir)
+        obj[k] = CSON.parse(fs.readFileSync filename)
+
+      if filename
+        _parseInclude obj[k], path.dirname filename
+      else
+        _parseInclude obj[k], dir
+
+
+_parseFromObj = (obj, defs, pwd = process.env.PWD) ->
   obj = _.clone obj
 
-  _parseInclude obj
+  _parseInclude obj, pwd
 
   defs = _parseField _parseDefs(obj, defs)
 
@@ -162,7 +178,7 @@ parse = (source, callback) ->
         # CSON.parseFile does not support customized file extension, see https://github.com/bevry/cson/issues/49
         fs.readFile source, (err, data) ->
           return callback(err) if err
-          callback(null, _parseFromObj(CSON.parse data))
+          callback(null, _parseFromObj(CSON.parse(data), null, DIR))
 
       when 'object'
         callback(null, _parseFromObj(source))
@@ -182,7 +198,7 @@ parseSync = (source, defs) ->
     DIR = path.dirname _normalize_path(source, process.env.PWD)
     source = CSON.parse fs.readFileSync(source)
 
-  _parseFromObj source, defs
+  _parseFromObj source, defs, DIR
 
 
 module.exports.parse = parse
