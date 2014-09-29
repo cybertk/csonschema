@@ -475,6 +475,29 @@ describe 'Parse Async', ->
         field.properties.username.type.should.equal 'string'
         field.properties.age.type.should.equal 'integer'
 
+    describe 'contains $defs', ->
+
+      before (done) ->
+        include = """
+                  $defs:
+                    foo: 'string'
+                  username: 'foo'
+                  """
+        tmp.file (err, path, fd) ->
+          return done(err) if err
+
+          fs.writeFileSync(path, include)
+          source = [
+            '$include': path
+          ]
+
+          csonschema.parse source, resultHandler(done)
+
+      it 'should be a array', ->
+        obj.type.should.equal 'array'
+        obj.items.type.should.equal 'object'
+        obj.items.properties.username.type.should.equal 'string'
+
   describe 'With invalid schema', ->
 
     describe 'contains $required', ->

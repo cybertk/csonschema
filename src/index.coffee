@@ -29,10 +29,6 @@ _parseField = (source, defs) ->
       # $raw field
       return source.$raw if source.$raw
 
-      # $include field
-      # TODO(quanlong): Async this call
-      return _parseField CSON.parse(fs.readFileSync _normalize_path(source.$include, DIR)), defs if source.$include
-
       # Object field
       return _parseObj source, defs
 
@@ -136,8 +132,20 @@ _parseDefs = (obj, defs) ->
   delete obj.$defs
   defs
 
+_parseInclude = (obj) ->
+  return unless _.isObject(obj)
+
+  for k, v of obj
+    if v.$include
+      obj[k] = CSON.parse(fs.readFileSync _normalize_path(v.$include, DIR))
+
+    _parseInclude v
+
 _parseFromObj = (obj, defs) ->
   obj = _.clone obj
+
+  _parseInclude obj
+
   defs = _parseField _parseDefs(obj, defs)
 
   jsonschema = _parseField obj, defs
@@ -173,11 +181,6 @@ parseSync = (source, defs) ->
   if typeof(source) is 'string'
     DIR = path.dirname _normalize_path(source, process.env.PWD)
     source = CSON.parse fs.readFileSync(source)
-
-  # Extend $_ from global defs
-  # source.$defs ?= {}
-  # source.$defs.$_ ?= {}
-  # _.extend(source.$defs.$_, defs) if _.isObject(defs)
 
   _parseFromObj source, defs
 
