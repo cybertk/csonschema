@@ -377,6 +377,20 @@ describe 'Parse Async', ->
         obj.required.should.have.length 1
         obj.required.should.include 'verified'
 
+    describe 'and requried nothing', ->
+
+      before (done) ->
+        source =
+          username: 'string'
+          age: 'integer'
+          verified: 'boolean'
+          $required: ''
+
+        csonschema.parse source, resultHandler(done)
+
+      it 'should requires nothing', ->
+        obj.required.should.have.length 0
+
   describe 'Schema with $raw', ->
 
     source = ''

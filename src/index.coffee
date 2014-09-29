@@ -73,14 +73,17 @@ _parseRequired = (source) ->
   unrequires = []
 
   # Fill requires and unrequires array
-  if source.$required
+  if _.has source, '$required'
     throw new Error('$required should be string') unless _.isString(source.$required)
+
+    return [] unless source.$required
 
     for field in source.$required.split ' '
       if field.substring(0, 1) is '-'
         unrequires.push field.substring(1)
       else
         requires.push field
+
 
   if requires.length > 0 and unrequires.length > 0
     throw new Error('Should not mix required and unrequired')
