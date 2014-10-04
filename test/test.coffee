@@ -2,6 +2,7 @@ csonschema = require '..'
 chai = require 'chai'
 fs = require 'fs'
 tmp = require 'tmp'
+CSON = require 'cson-safe'
 
 chai.should()
 expect = chai.expect
@@ -16,7 +17,7 @@ resultHandler = (callback) ->
     obj = _obj
     callback()
 
-describe 'Parse Async', ->
+describe 'Parse CSON object', ->
 
   source = ''
 
@@ -571,37 +572,44 @@ describe 'Parse Async', ->
   describe 'From file', ->
 
     describe 'with simple schema', ->
-      before (done) ->
-        csonschema.parse "#{__dirname}/fixtures/sample1.schema", (err, _obj) ->
-          obj = _obj
-          done()
+      before ->
+        obj = csonschema.parseSync "#{__dirname}/fixtures/sample1.schema"
 
       it 'should be a object', ->
         obj.type.should.equal 'object'
         obj.properties.should.be.a 'object'
 
     describe 'with schema contains $include', ->
-      before (done) ->
-        csonschema.parse "#{__dirname}/fixtures/sample2.schema", (err, _obj) ->
-          obj = _obj
-          done()
+      before ->
+        obj = csonschema.parseSync "#{__dirname}/fixtures/sample2.schema"
 
       it 'should be a object', ->
         obj.type.should.equal 'object'
         obj.properties.should.be.a 'object'
 
     describe 'with schema contains $include twice', ->
-      before (done) ->
-        csonschema.parse "#{__dirname}/fixtures/sample2.schema", (err, _obj) ->
-          obj = _obj
-
-          csonschema.parse "#{__dirname}/fixtures/sample2.schema", (err, _obj) ->
-            obj = _obj
-            done()
+      before ->
+        obj = csonschema.parseSync "#{__dirname}/fixtures/sample2.schema"
+        obj = csonschema.parseSync "#{__dirname}/fixtures/sample2.schema"
 
       it 'should be a object', ->
         obj.type.should.equal 'object'
         obj.properties.should.be.a 'object'
+
+describe 'Parse String', ->
+
+  describe 'Simple schema', ->
+
+    before (done) ->
+      source =
+        username: 'string'
+
+      csonschema.parse CSON.stringify(source), resultHandler(done)
+
+    it 'should be a jsonschema', ->
+      console.log(obj, err)
+      obj.$schema.should.equal 'http://json-schema.org/draft-04/schema'
+
 
 describe 'Parse Sync', ->
 

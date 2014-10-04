@@ -172,21 +172,18 @@ _parseFromObj = (obj, defs, pwd = process.env.PWD) ->
 parse = (source, callback) ->
 
   try
-    switch typeof(source)
-      when 'string'
-        DIR = path.dirname _normalize_path(source, process.env.PWD)
-        # CSON.parseFile does not support customized file extension, see https://github.com/bevry/cson/issues/49
-        fs.readFile source, (err, data) ->
-          return callback(err) if err
-          callback(null, _parseFromObj(CSON.parse(data), null, DIR))
+    source = CSON.parse source if _.isString(source)
+    return callback(new Error('<source> should be object or string')) unless _.isObject(source)
 
-      when 'object'
-        callback(null, _parseFromObj(source))
-      else
-        callback(new Error('You must supply either file or obj as source.'))
+    # Global defs
+    # defs = CSON.parse source if _.isString(defs)
+    # return callback(new Error('<defs> should be object or string')) unless _.isObject(defs)
+    defs = {}
 
+    callback(null, _parseFromObj source, {$_: defs})
   catch error
     callback(error)
+
 
 parseSync = (source, defs) ->
   throw new Error('You must supply either file or obj as source.') unless typeof(source) is 'string' or 'object'
