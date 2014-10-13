@@ -22,6 +22,8 @@ _parseCustomizedType = (type, defs) ->
     defs.properties[t0]
 
 _parseField = (source, defs) ->
+  return unless source
+
   if _.isArray source
     return _parseArray source, defs
 
@@ -35,7 +37,7 @@ _parseField = (source, defs) ->
   else if _.isString source
     return _parseString source, defs
   else
-    throw Error("Syntax error, does not support '#{typeof source}'field")
+    throw new Error("Syntax error, does not support '#{typeof source}'field")
 
 _parseArray = (array, defs) ->
   # Enum field
@@ -169,34 +171,27 @@ _parseFromObj = (obj, defs, pwd = process.env.PWD) ->
 
   return jsonschema
 
-parse = (source, callback) ->
+# callback(source, [defs], [callback])
+parse = (source, defs, callback) ->
+
+  done = (error, obj) ->
+    if error
+      if callback then callback(error) else throw error
+    else
+      if callback then callback(null, obj) else obj
+
+  callback ?= defs if _.isFunction(defs)
 
   try
     source = CSON.parse source if _.isString(source)
-    return callback(new Error('<source> should be object or string')) unless _.isObject(source)
+    return done(new Error('<source> should be object or string')) unless _.isObject(source)
 
     # Global defs
-    # defs = CSON.parse source if _.isString(defs)
-    # return callback(new Error('<defs> should be object or string')) unless _.isObject(defs)
-    defs = {}
+    defs = CSON.parse(fs.readFileSync(defs)) if _.isString(defs)
 
-    callback(null, _parseFromObj source, {$_: defs})
+    return done(null, _parseFromObj(source, {$_: defs}), process.env.PWD)
   catch error
-    callback(error)
-
-
-parseSync = (source, defs) ->
-  throw new Error('You must supply either file or obj as source.') unless typeof(source) is 'string' or 'object'
-
-  # Global defs
-  defs = {$_: CSON.parse fs.readFileSync(defs)} if _.isString(defs)
-
-  if typeof(source) is 'string'
-    DIR = path.dirname _normalize_path(source, process.env.PWD)
-    source = CSON.parse fs.readFileSync(source)
-
-  _parseFromObj source, defs, DIR
+    done(error)
 
 
 module.exports.parse = parse
-module.exports.parseSync = parseSync

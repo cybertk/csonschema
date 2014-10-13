@@ -510,7 +510,6 @@ describe 'Parse CSON object', ->
         csonschema.parse source, resultHandler(done)
 
       it 'should be a array', ->
-        # console.log(err, obj)
         obj.type.should.equal 'array'
         obj.items.type.should.equal 'object'
         obj.items.properties.username.type.should.equal 'string'
@@ -569,32 +568,6 @@ describe 'Parse CSON object', ->
         err.name.should.equal 'Error'
         err.message.should.equal 'Type is not defined: bar'
 
-  describe 'From file', ->
-
-    describe 'with simple schema', ->
-      before ->
-        obj = csonschema.parseSync "#{__dirname}/fixtures/sample1.schema"
-
-      it 'should be a object', ->
-        obj.type.should.equal 'object'
-        obj.properties.should.be.a 'object'
-
-    describe 'with schema contains $include', ->
-      before ->
-        obj = csonschema.parseSync "#{__dirname}/fixtures/sample2.schema"
-
-      it 'should be a object', ->
-        obj.type.should.equal 'object'
-        obj.properties.should.be.a 'object'
-
-    describe 'with schema contains $include twice', ->
-      before ->
-        obj = csonschema.parseSync "#{__dirname}/fixtures/sample2.schema"
-        obj = csonschema.parseSync "#{__dirname}/fixtures/sample2.schema"
-
-      it 'should be a object', ->
-        obj.type.should.equal 'object'
-        obj.properties.should.be.a 'object'
 
 describe 'Parse String', ->
 
@@ -607,7 +580,6 @@ describe 'Parse String', ->
       csonschema.parse CSON.stringify(source), resultHandler(done)
 
     it 'should be a jsonschema', ->
-      console.log(obj, err)
       obj.$schema.should.equal 'http://json-schema.org/draft-04/schema'
 
 
@@ -621,7 +593,7 @@ describe 'Parse Sync', ->
       source =
         username: 'string'
 
-      obj = csonschema.parseSync source
+      obj = csonschema.parse source
 
     it 'should be a jsonschema', ->
       obj.$schema.should.equal 'http://json-schema.org/draft-04/schema'
@@ -630,10 +602,14 @@ describe 'Parse Sync', ->
 
     before ->
       source =
-        username: 'string'
+        $defs:
+          $_:
+            $include: 'test/fixtures/sample1.schema'
 
-      obj = csonschema.parseSync "test/fixtures/sample2.schema"
-      obj = csonschema.parseSync "test/fixtures/sample2.schema"
+        username: 'username'
+
+      obj = csonschema.parse source
+      obj = csonschema.parse source
 
     it 'should be a jsonschema', ->
       obj.$schema.should.equal 'http://json-schema.org/draft-04/schema'
@@ -652,7 +628,7 @@ describe 'Parse Sync', ->
 
           fs.writeFileSync(path, defs)
 
-          obj = csonschema.parseSync source, path
+          obj = csonschema.parse source, path
           done()
 
       it 'should be a jsonschema', ->
@@ -674,7 +650,7 @@ describe 'Parse Sync', ->
 
           fs.writeFileSync(path, defs)
 
-          obj = csonschema.parseSync source, path
+          obj = csonschema.parse source, path
           done()
 
       it 'should be a jsonschema', ->
@@ -687,13 +663,15 @@ describe 'Parse Sync', ->
 
       before (done)->
         defs = "foo: 'string'"
+        source =
+          username: 'foo'
 
         tmp.file (err, path, fd) ->
           return done(err) if err
 
           fs.writeFileSync(path, defs)
 
-          obj = csonschema.parseSync "#{__dirname}/fixtures/sample3.schema", path
+          obj = csonschema.parse source, path
           done()
 
       it 'should be a jsonschema', ->
