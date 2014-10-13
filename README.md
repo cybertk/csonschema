@@ -23,10 +23,10 @@ created_at: 'date'
 
 ### Advanced csonschema
 
-```
-$defs
+```coffee
+$defs:
   $_:
-    geo-point: ['number']
+    'geo-point': ['number']
     photo:
       w: 'integer'
       h: 'integer'
@@ -69,30 +69,53 @@ $required: '-location -tags'
 
 ### CLI
 
-    $ csonschema schema.cson
+See [csonschema-cli][]
 
-### As lib in code
+[csonschema-cli]: http://github.com/cybertk/csonschema-cli
 
-```
+### Javascript
+
+```javascript
 // Include csonschema
-schema = require('csonschema');
+csonschema = require('csonschema');
 
-// Parse a file path
-schema.parse('data.cson', function(err,obj){});  // async
+schema = [{
+  id: 'integer',
+  username: 'string'
+}]
 
-// Parse a String
-schema.parse(src, function(err,obj){});  // async
+// Parse sync
+jsonschema = csonschema.parse(schema);
 
-// Synchronize Parse
-obj = schema.parseSync(src);  // sync
+// Parse async
+csonschema.parse(schema, function(err, obj) {
+  jsonschema = obj
+});
+```
+
+### Coffeescript
+
+```coffee
+csonschema = require 'csonschema'
+
+schema = [
+  id: 'integer'
+  username: 'string'
+]
+
+// Parse sync
+jsonschema = csonschema.parse schema
+
+// Parse async
+csonschema.parse schema, (err, obj) ->
+  jsonschema = obj
 ```
 
 #### Raw Field
 
 Raw Field will be translated to json format directly without any modification, it is represented with `$raw` keyword.
 
-```yaml
-
+```coffee
 username:
   $raw:
     type: 'string'
@@ -108,8 +131,7 @@ date:
 
 additionalProperties is false by default
 
-```yaml
-
+```coffee
 $defs:
   username: 'string'
 
@@ -124,7 +146,7 @@ user:
 
 Array as root object
 
-```yaml
+```coffee
 [
   user: 'user'
 ]
@@ -132,7 +154,7 @@ Array as root object
 
 Array in field
 
-```yaml
+```coffee
 username: 'string'
 photos: [
   url: 'string'
@@ -145,7 +167,7 @@ Customized types are defined under `$defs`.
 - Support reference with cascading format like `foo.bar`
 - Global types without typing prefix `$_`. e.g. `$_.foo` is equal to `foo`
 
-```yaml
+```coffee
 $defs:
   $_:
     location:

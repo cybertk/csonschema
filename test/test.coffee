@@ -2,6 +2,7 @@ csonschema = require '..'
 chai = require 'chai'
 fs = require 'fs'
 tmp = require 'tmp'
+CSON = require 'cson-safe'
 
 chai.should()
 expect = chai.expect
@@ -16,7 +17,7 @@ resultHandler = (callback) ->
     obj = _obj
     callback()
 
-describe 'Parse Async', ->
+describe 'Parse CSON object', ->
 
   source = ''
 
@@ -509,7 +510,6 @@ describe 'Parse Async', ->
         csonschema.parse source, resultHandler(done)
 
       it 'should be a array', ->
-        # console.log(err, obj)
         obj.type.should.equal 'array'
         obj.items.type.should.equal 'object'
         obj.items.properties.username.type.should.equal 'string'
@@ -568,40 +568,20 @@ describe 'Parse Async', ->
         err.name.should.equal 'Error'
         err.message.should.equal 'Type is not defined: bar'
 
-  describe 'From file', ->
 
-    describe 'with simple schema', ->
-      before (done) ->
-        csonschema.parse "#{__dirname}/fixtures/sample1.schema", (err, _obj) ->
-          obj = _obj
-          done()
+describe 'Parse String', ->
 
-      it 'should be a object', ->
-        obj.type.should.equal 'object'
-        obj.properties.should.be.a 'object'
+  describe 'Simple schema', ->
 
-    describe 'with schema contains $include', ->
-      before (done) ->
-        csonschema.parse "#{__dirname}/fixtures/sample2.schema", (err, _obj) ->
-          obj = _obj
-          done()
+    before (done) ->
+      source =
+        username: 'string'
 
-      it 'should be a object', ->
-        obj.type.should.equal 'object'
-        obj.properties.should.be.a 'object'
+      csonschema.parse CSON.stringify(source), resultHandler(done)
 
-    describe 'with schema contains $include twice', ->
-      before (done) ->
-        csonschema.parse "#{__dirname}/fixtures/sample2.schema", (err, _obj) ->
-          obj = _obj
+    it 'should be a jsonschema', ->
+      obj.$schema.should.equal 'http://json-schema.org/draft-04/schema'
 
-          csonschema.parse "#{__dirname}/fixtures/sample2.schema", (err, _obj) ->
-            obj = _obj
-            done()
-
-      it 'should be a object', ->
-        obj.type.should.equal 'object'
-        obj.properties.should.be.a 'object'
 
 describe 'Parse Sync', ->
 
@@ -613,7 +593,7 @@ describe 'Parse Sync', ->
       source =
         username: 'string'
 
-      obj = csonschema.parseSync source
+      obj = csonschema.parse source
 
     it 'should be a jsonschema', ->
       obj.$schema.should.equal 'http://json-schema.org/draft-04/schema'
@@ -622,10 +602,14 @@ describe 'Parse Sync', ->
 
     before ->
       source =
-        username: 'string'
+        $defs:
+          $_:
+            $include: 'test/fixtures/sample1.schema'
 
-      obj = csonschema.parseSync "test/fixtures/sample2.schema"
-      obj = csonschema.parseSync "test/fixtures/sample2.schema"
+        username: 'username'
+
+      obj = csonschema.parse source
+      obj = csonschema.parse source
 
     it 'should be a jsonschema', ->
       obj.$schema.should.equal 'http://json-schema.org/draft-04/schema'
@@ -644,7 +628,7 @@ describe 'Parse Sync', ->
 
           fs.writeFileSync(path, defs)
 
-          obj = csonschema.parseSync source, path
+          obj = csonschema.parse source, path
           done()
 
       it 'should be a jsonschema', ->
@@ -666,7 +650,7 @@ describe 'Parse Sync', ->
 
           fs.writeFileSync(path, defs)
 
-          obj = csonschema.parseSync source, path
+          obj = csonschema.parse source, path
           done()
 
       it 'should be a jsonschema', ->
@@ -679,13 +663,15 @@ describe 'Parse Sync', ->
 
       before (done)->
         defs = "foo: 'string'"
+        source =
+          username: 'foo'
 
         tmp.file (err, path, fd) ->
           return done(err) if err
 
           fs.writeFileSync(path, defs)
 
-          obj = csonschema.parseSync "#{__dirname}/fixtures/sample3.schema", path
+          obj = csonschema.parse source, path
           done()
 
       it 'should be a jsonschema', ->
