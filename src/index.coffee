@@ -174,12 +174,18 @@ _parseFromObj = (obj, defs, pwd = process.env.PWD) ->
 # callback(source, [defs], [callback])
 parse = (source, defs, callback) ->
 
+  # Return result
   done = (error, obj) ->
-    if error
-      if callback then callback(error) else throw error
+    # Return result async
+    if callback
+      return callback(error) if error
+      callback(null, obj)
+    # Return result sync
     else
-      if callback then callback(null, obj) else obj
+      throw error if error
+      obj
 
+  # when call parse() with only two params, i.e. parse(source, done)
   callback ?= defs if _.isFunction(defs)
 
   try
