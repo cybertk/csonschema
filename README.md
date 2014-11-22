@@ -184,3 +184,7 @@ $defs:
     $ npm test
 
 Any contribution is more then welcome!
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/cybertk/csonschema/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
