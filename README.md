@@ -3,9 +3,10 @@
 Write jsonschema with cson
 
 
-[![Build Status](http://img.shields.io/travis/cybertk/csonschema.svg?style=flat)](https://travis-ci.org/cybertk/csonschema)
-[![Dependency Status](https://david-dm.org/cybertk/csonschema.png)](https://david-dm.org/cybertk/csonschema)
-[![Coverage Status](https://coveralls.io/repos/cybertk/csonschema/badge.png?branch=master)](https://coveralls.io/r/cybertk/csonschema?branch=master)
+[![NPM](https://img.shields.io/npm/v/csonschema.svg)](https://www.npmjs.org/package/csonschema)
+[![Build Status](http://img.shields.io/travis/cybertk/csonschema.svg)](https://travis-ci.org/cybertk/csonschema)
+[![Dependency Status](https://david-dm.org/cybertk/csonschema.svg)](https://david-dm.org/cybertk/csonschema)
+[![Coverage Status](https://img.shields.io/coveralls/cybertk/csonschema.svg)](https://coveralls.io/r/cybertk/csonschema)
 
 ## Features
 
@@ -187,4 +188,3 @@ Any contribution is more then welcome!
 
 
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/cybertk/csonschema/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
-
