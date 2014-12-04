@@ -9,3 +9,4 @@ deploy:
     secure: SSUN6HzVYyi+u4ZP+PqFWZbvXV0zZVzFtebdyv0P1oF7mEhxbfooLGg6X7OQfCL4y6IZTPD5EQFDHvqLBBv81NcPqp/3GynzVZywRb3i8k0Wd+NKNuWJ8K9MYTUWNvnTgaOlraZyjG2gXkmKbEaybbEeS0Zj9fb9DJmy6ONzaqk=
   on:
     tags: true
+    branch: master
