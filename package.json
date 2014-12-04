@@ -1,6 +1,6 @@
 {
   "name": "csonschema",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Write jsonschema with cson",
   "main": "lib/index.js",
   "directories": {
