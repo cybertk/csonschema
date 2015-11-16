@@ -42,7 +42,7 @@
     "tmp": "0.0.24"
   },
   "dependencies": {
-    "cson-safe": "^1.0.0",
+    "cson-parser": "^1.2.0",
     "underscore": "^1.7.0"
   }
 }
