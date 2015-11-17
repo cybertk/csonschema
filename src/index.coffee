@@ -1,5 +1,5 @@
 fs = require 'fs'
-CSON = require 'cson-safe'
+CSON = require 'cson-parser'
 _ = require 'underscore'
 path = require 'path'
 

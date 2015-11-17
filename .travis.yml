@@ -1,12 +1,22 @@
+sudo: false
 language: node_js
 node_js:
+- '5.0'
+- '4.2'
+- '0.12'
+- '0.11'
 - '0.10'
+- 'iojs'
 env:
 - NODE_ENV=development
+notifications:
+  slack:
+    secure: QbqKBvB5JmcNTrpBUqMPz98F8J7H/vuHxYo7UyIJkYXfxRPjHTFNhVRdgJCI822I9ToqHY4st/8cqrWAbFi/xZHkHsAmsft185fQaw07Td+UhBlaGhLJKGDzHyMNSDCV5vLdze3sFFbMprboROLFfhc1O22Ylg8BqLM49ggom+Y=
 deploy:
   provider: npm
+  email: kyan.ql.he@gmail.com
   api_key:
     secure: SSUN6HzVYyi+u4ZP+PqFWZbvXV0zZVzFtebdyv0P1oF7mEhxbfooLGg6X7OQfCL4y6IZTPD5EQFDHvqLBBv81NcPqp/3GynzVZywRb3i8k0Wd+NKNuWJ8K9MYTUWNvnTgaOlraZyjG2gXkmKbEaybbEeS0Zj9fb9DJmy6ONzaqk=
   on:
     tags: true
-    branch: master
+    repo: cybertk/csonschema

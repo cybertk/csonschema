@@ -2,7 +2,7 @@ csonschema = require '..'
 chai = require 'chai'
 fs = require 'fs'
 tmp = require 'tmp'
-CSON = require 'cson-safe'
+CSON = require 'cson-parser'
 
 chai.should()
 expect = chai.expect
