@@ -4,8 +4,6 @@ node_js:
 - '5.0'
 - '4.2'
 - '0.12'
-- '0.11'
-- '0.10'
 - iojs
 env:
 - NODE_ENV=development
@@ -19,4 +17,5 @@ deploy:
     secure: FpFRu5T0+kNImKSV7oE44fhufg2V9W/fTkEsmx1oojWohE8s9wCczhTSupMt6agVZzQzgtSuiQtAFn6x3oHW4PG1YWTWiMEjq3I2AbFahDXXTuwGNDbqXN1BzhUi222ZB3Zxo5khJvKCH7J392wAYUvrC5YSHqkCakX3xe3Dv6E=
   on:
     tags: true
+    node: '5.0'
     repo: cybertk/csonschema
