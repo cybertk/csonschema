@@ -178,6 +178,31 @@ $defs:
   username: 'string'
 ```
 
+### Required fields
+
+By default all fields are required. However, using `$required` it is possible to
+define which ones are required:
+
+```coffee
+firstname: 'string'
+lastname: 'string'
+
+$required: 'firstname'
+```
+
+This example will set `firstname` as a required field.
+Also, you can define which fields are not required by prefixing with a dash (`-`):
+
+```coffee
+firstname: 'string'
+lastname: 'string'
+
+$required: '-lastname'
+```
+
+Both examples will lead to the same, having `firstname` as required and `lastname`
+as optional.
+
 ## Contribution
 
 ## Run Tests
