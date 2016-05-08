@@ -54,7 +54,7 @@ photo: 'photo'
 location: 'geo-point'
 created_at: 'date'
 
-$required: 'location tags'
+$required: '-location -tags'
 ```
 
 ## Installation
@@ -140,7 +140,7 @@ user:
   username: 'username'
   created_at: 'date'
   updated_at: 'date'
-  $required: 'username created_at'
+  $required: '-username -created_at'
 ```
 
 #### Array Field
