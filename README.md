@@ -200,8 +200,8 @@ lastname: 'string'
 $required: '-lastname'
 ```
 
-Both examples will lead to the same, having `firstname` as required and `lastname`
-as optional.
+Both examples will lead to the same result, having `firstname` as required and
+`lastname` as optional.
 
 ## Contribution
 
